@@ -1,0 +1,33 @@
+html {
+	box-sizing: border-box;
+	font-size: 16px;
+}
+
+*, *::before, *::after {
+	box-sizing: inherit;
+}
+
+body {
+	margin: 0;
+}
+
+.page-wrapper {
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.flex-container {
+	display: flex;
+	flex-flow: row wrap;
+}
+
+#updates {
+	flex: 100%;
+	text-align: center;
+	margin: 0.5em 0;
+}
+
+#drawing-area {
+	/* flex: 100%; */
+	border: 1px solid black;
+}
