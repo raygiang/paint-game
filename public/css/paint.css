@@ -9,6 +9,10 @@ html {
 
 body {
 	margin: 0;
+	background-image: url("../images/page-background.jpg");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
 }
 
 .page-wrapper {
@@ -21,13 +25,35 @@ body {
 	flex-flow: row wrap;
 }
 
+[class$="bar"] {
+	height: 20px;
+	margin-bottom: 1em;
+	border: 1px solid #000;
+}
+
+.blue-bar {
+	background: #39ffd2;
+}
+
+.red-bar {
+	background: #f96e6e;
+}
+
+.green-bar {
+	background: #34ff41;
+}
+
+.yellow-bar {
+	background: #fcff00;
+}
+
 #updates {
 	flex: 100%;
 	text-align: center;
 	margin: 0.5em 0;
 }
 
-#drawing-area {
-	/* flex: 100%; */
+#game-area {
 	border: 1px solid black;
+	margin: auto;
 }
