@@ -50,6 +50,7 @@ socket.on("updateCanvas", function(data){
 });
 
 socket.on("startGame", function(data){
+    paintedSquares = [];
     backgroundImage.onload = function(){
         context.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); 
     };

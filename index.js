@@ -61,6 +61,8 @@ io.on("connection", function (socket) {
 
     socket.on("disconnect", function () {
         console.log(socket.id + " has discconected");
+        delete playerChars[socket.id];
+        numConnections--;
     });
 
     socket.on("moveMade", function(data) {
