@@ -45,7 +45,7 @@ io.on("connection", function (socket) {
         if(numConnections === 1) {
             playerChars[socket.id] = tealBlock;
             io.sockets.to(socket.id).emit("getChar", tealBlock);
-            io.sockets.emit("startGame", playerChars);
+            // io.sockets.emit("startGame", playerChars);
         } else if(numConnections === 2) {
             playerChars[socket.id] = redBlock;
             io.sockets.to(socket.id).emit("getChar", redBlock);
