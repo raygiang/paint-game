@@ -33,6 +33,8 @@ var yellowBlock = new Player(520, 520, "#fcff00", 3);
 
 var numConnections = 0;
 var playerChars = {};
+var roundStarted = false;
+var waitlist = {};
 
 io.on("connection", function (socket) {
     console.log("connection made with id: " + socket.id);
@@ -43,7 +45,7 @@ io.on("connection", function (socket) {
         if(numConnections === 1) {
             playerChars[socket.id] = tealBlock;
             io.sockets.to(socket.id).emit("getChar", tealBlock);
-            // io.sockets.emit("startGame", playerChars);
+            io.sockets.emit("startGame", playerChars);
         } else if(numConnections === 2) {
             playerChars[socket.id] = redBlock;
             io.sockets.to(socket.id).emit("getChar", redBlock);
@@ -55,6 +57,7 @@ io.on("connection", function (socket) {
             io.sockets.to(socket.id).emit("getChar", yellowBlock);
         }
     }
+    
     if(numConnections === 4) {
         io.sockets.emit("startGame", playerChars);
     }

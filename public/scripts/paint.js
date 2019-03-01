@@ -91,7 +91,7 @@ socket.on("startGame", function(data){
             removeEventListener("keydown", moveListener);
             socket.emit("gameOver");
         }, 60000);
-    }, 15000);
+    }, 1000);
 
     addEventListener("keyup", function(e) { delete keysPressed[e.keyCode] });
 });
