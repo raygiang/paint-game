@@ -4,14 +4,46 @@
   <meta charset="utf-8" />
   <title>Paint Game</title>
   <meta name="viewport" content="width=device-width">
+  <link href="https://fonts.googleapis.com/css?family=Luckiest+Guy&display=swap" rel="stylesheet"> 
   <link rel="stylesheet" type="text/css" href="css/paint.css">
 </head>
 <body>
-  <main id="main">
-    <div id="stage" class="page-wrapper flex-container">
-      <div id="updates"></div>
-      <canvas id="game-area">
-      </canvas>
+  <header id="header">
+    <div class="page-wrapper">
+      <h1>Paint Game</h1>
+    </div>
+  </header>
+  <main id="main" class="page-wrapper">
+    <div id="updates"></div>
+    <button id="play-again">Play Again</button>
+    <div id="stage" class="flex-container">
+      <canvas id="game-area"></canvas>
+      <div id="game-panel">
+        <h3 class="panel-text">Instructions</h3>
+        <div class="panel-text">The game will start once four players have connected. Use the arrow keys to move around. Try to fill the screen with the most of your colour to win.</div>
+
+        <h3 class="panel-text">Player List</h3>
+
+        <div class="player-card flex-container">
+          <img src="images/blue-block-thumbnail.png" alt="Thumbnail of Blue Block Player" class="player-image">
+          <span class="player-name">No Player</span>
+        </div>
+
+        <div class="player-card flex-container">
+          <img src="images/red-block-thumbnail.png" alt="Thumbnail of Red Block Player" class="player-image">
+          <span class="player-name">No Player</span>
+        </div>
+
+        <div class="player-card flex-container">
+          <img src="images/green-block-thumbnail.png" alt="Thumbnail of Green Block Player" class="player-image">
+          <span class="player-name">No Player</span>
+        </div>
+
+        <div class="player-card flex-container">
+          <img src="images/yellow-block-thumbnail.png" alt="Thumbnail of Yellow Block Player" class="player-image">
+          <span class="player-name">No Player</span>
+        </div>
+      </div>
     </div>
   </main>
 

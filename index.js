@@ -1,15 +1,15 @@
-var express = require("express"); 
-var http = require("http");
-var socketIO = require("socket.io");
-var path = require("path");
+const express = require("express"); 
+const http = require("http");
+const socketIO = require("socket.io");
+const path = require("path");
 
-var app = express();
-var server = http.createServer(app);
-var io = socketIO.listen(server);
+const app = express();
+const server = http.createServer(app);
+const io = socketIO.listen(server);
 
 app.use(express.static(path.join(__dirname + "/public")));
-server.listen(process.env.PORT || 9002, '0.0.0.0');
-console.log("Server running on localhost:9002");
+server.listen(process.env.PORT || 9001, '0.0.0.0');
+console.log("Server running on localhost:9001");
 
 function Player(startX, startY, paintCol, imgNum) {
     this.x = startX;
@@ -24,48 +24,95 @@ function Player(startX, startY, paintCol, imgNum) {
     this.isMoving = false;
     this.paintColour = paintCol;
     this.imgNum = imgNum;
+    this.playerName = "";
 }
 
-var tealBlock = new Player(56, 32, "#39ffd2", 0);
-var redBlock = new Player(56, 520, "#f96e6e", 1);
-var greenBlock = new Player(520, 32, "#34ff41", 2);
-var yellowBlock = new Player(520, 520, "#fcff00", 3);
+const tealBlock = new Player(56, 32, "#39ffd2", 0);
+const redBlock = new Player(56, 520, "#f96e6e", 1);
+const greenBlock = new Player(520, 32, "#34ff41", 2);
+const yellowBlock = new Player(520, 520, "#fcff00", 3);
 
-var numConnections = 0;
-var playerChars = {};
-var roundStarted = false;
-var waitlist = {};
+let numConnections = 0;
+let playerChars = {};
+let playerNames = {};
+let roundStarted = false;
+let assignedBlocks = new Array(4);
+
+let assignBlock = (socketId) => {
+    if(!assignedBlocks[0]) {
+        assignedBlocks[0] = socketId;
+        tealBlock.playerName = playerNames[socketId];
+        playerChars[socketId] = tealBlock;
+        io.sockets.to(socketId).emit("getChar", tealBlock);
+    }
+    else if(!assignedBlocks[1]) {
+        assignedBlocks[1] = socketId;
+        redBlock.playerName = playerNames[socketId];
+        playerChars[socketId] = redBlock;
+        io.sockets.to(socketId).emit("getChar", redBlock);
+    }
+    else if(!assignedBlocks[2]) {
+        assignedBlocks[2] = socketId;
+        greenBlock.playerName = playerNames[socketId];
+        playerChars[socketId] = greenBlock;
+        io.sockets.to(socketId).emit("getChar", greenBlock);
+    }
+    else {
+        assignedBlocks[3] = socketId;
+        yellowBlock.playerName = playerNames[socketId];
+        playerChars[socketId] = yellowBlock;
+        io.sockets.to(socketId).emit("getChar", yellowBlock);
+    }
+    io.sockets.emit("updatePlayers", playerChars);
+}
 
 io.on("connection", function (socket) {
     console.log("connection made with id: " + socket.id);
 
-    numConnections++;
+    socket.on("newPlayer", function(data) {
+        playerNames[socket.id] = data;
 
-    if(numConnections <= 4) {
-        if(numConnections === 1) {
-            playerChars[socket.id] = tealBlock;
-            io.sockets.to(socket.id).emit("getChar", tealBlock);
-            // io.sockets.emit("startGame", playerChars);
-        } else if(numConnections === 2) {
-            playerChars[socket.id] = redBlock;
-            io.sockets.to(socket.id).emit("getChar", redBlock);
-        } else if(numConnections === 3) {
-            playerChars[socket.id] = greenBlock;
-            io.sockets.to(socket.id).emit("getChar", greenBlock);
-        } else {
-            playerChars[socket.id] = yellowBlock;
-            io.sockets.to(socket.id).emit("getChar", yellowBlock);
+        if(!roundStarted && numConnections < 4) {
+            if(numConnections === 1) {
+                assignBlock(socket.id);
+            } else if(numConnections === 2) {
+                assignBlock(socket.id);
+            } else if(numConnections === 3) {
+                assignBlock(socket.id);
+            } else {
+                assignBlock(socket.id);
+            }
+            numConnections++;
         }
-    }
-    
-    if(numConnections === 4) {
-        io.sockets.emit("startGame", playerChars);
-    }
+        
+        if(numConnections === 4 && !roundStarted) {
+            roundStarted = true;
+            io.sockets.emit("startGame", playerChars);
+        }
+        else if(roundStarted) {
+            io.sockets.emit("tryAgain");
+        }
+    });
 
     socket.on("disconnect", function () {
         console.log(socket.id + " has discconected");
-        delete playerChars[socket.id];
-        numConnections--;
+        let socketIndex = assignedBlocks.indexOf(socket.id);
+
+        if(playerChars[socket.id]) {
+            playerChars[socket.id].playerName = "disconnected";
+            io.sockets.emit("updatePlayers", playerChars);
+        }
+
+        if(socketIndex !== -1) {
+            assignedBlocks[socketIndex] = null;
+            delete playerChars[socket.id];
+            delete playerNames[socket.id];
+            numConnections--;
+        }
+
+        if(numConnections === 0) {
+            roundStarted = false;
+        }
     });
 
     socket.on("moveMade", function(data) {
@@ -74,6 +121,11 @@ io.on("connection", function (socket) {
     });
 
     socket.on("gameOver", function() {
+        numConnections = 0;
+        playerChars = {};
+        playerNames = {};
+        roundStarted = false;
+        assignedBlocks = new Array(4);
         io.sockets.emit("endGame", playerChars);
     });
 });
