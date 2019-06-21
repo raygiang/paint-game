@@ -11,6 +11,7 @@ app.use(express.static(path.join(__dirname + "/public")));
 server.listen(process.env.PORT || 9001, '0.0.0.0');
 console.log("Server running on localhost:9001");
 
+// Function used to create a Player Block
 function Player(startX, startY, paintCol, imgNum) {
     this.x = startX;
     this.y = startY;
@@ -27,6 +28,7 @@ function Player(startX, startY, paintCol, imgNum) {
     this.playerName = "";
 }
 
+// Initialize the four blocks
 const tealBlock = new Player(56, 32, "#39ffd2", 0);
 const redBlock = new Player(56, 520, "#f96e6e", 1);
 const greenBlock = new Player(520, 32, "#34ff41", 2);
@@ -38,6 +40,7 @@ let playerNames = {};
 let roundStarted = false;
 let assignedBlocks = new Array(4);
 
+// Assign a player to a block that hasn't been taken yet
 let assignBlock = (socketId) => {
     if(!assignedBlocks[0]) {
         assignedBlocks[0] = socketId;
@@ -66,9 +69,12 @@ let assignBlock = (socketId) => {
     io.sockets.emit("updatePlayers", playerChars);
 }
 
+// On new connection
 io.on("connection", function (socket) {
     console.log("connection made with id: " + socket.id);
 
+    /* Tries to assign a block to a player if four players
+       have not connected yet and game has not started */ 
     socket.on("newPlayer", function(data) {
         playerNames[socket.id] = data;
 
@@ -94,6 +100,7 @@ io.on("connection", function (socket) {
         }
     });
 
+    // On disconnect
     socket.on("disconnect", function () {
         console.log(socket.id + " has discconected");
         let socketIndex = assignedBlocks.indexOf(socket.id);
@@ -115,11 +122,13 @@ io.on("connection", function (socket) {
         }
     });
 
+    // When a key is pressed to move a player
     socket.on("moveMade", function(data) {
         playerChars[socket.id] = data;
         io.sockets.emit("updateCanvas", playerChars);
     });
 
+    // When the game has ended
     socket.on("gameOver", function() {
         numConnections = 0;
         playerChars = {};

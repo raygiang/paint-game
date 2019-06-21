@@ -19,6 +19,7 @@ function pageInit() {
     let keysPressed = {};
     let playerName = null;
 
+    // Get player name
     while (playerName === null || playerName.trim() === "" || 
             playerName.toLowerCase().trim() === "no player" ||
             playerName.toLowerCase().trim() === "disconnected") {
@@ -27,6 +28,7 @@ function pageInit() {
 
     socket.emit("newPlayer", playerName);
 
+    // Converts RGB value to Hex
     function toHexValue(rgbComponent) {
         let hexValue = rgbComponent.toString(16);
 
@@ -37,20 +39,24 @@ function pageInit() {
         }
     }
 
+    // Retrieve the character assigned to this socket from the server
     socket.on("getChar", function(data) {
         character = data;
     });
 
+    // Notifies that a game is already started
     socket.on("tryAgain", function() {
         updateArea.innerHTML = "A game has already started, try again later";
     });
 
+    // Updates the player list
     socket.on("updatePlayers", function(data, item) {
         Object.keys(data).forEach((key) => {
             playerNames[data[key].imgNum].innerHTML = data[key].playerName;
         });
     });
 
+    // Update the canvas to reflect the current game
     socket.on("updateCanvas", function(data) {
         context.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
@@ -71,6 +77,7 @@ function pageInit() {
         }
     });
 
+    // Runs when four players have connected and the game is ready to start
     socket.on("startGame", function(data) {
         paintedSquares = [];
 
@@ -114,6 +121,7 @@ function pageInit() {
         addEventListener("keyup", function(e) { delete keysPressed[e.keyCode] });
     });
 
+    // Runs when the game is over, calculates the amount of colour on the canvas
     socket.on("endGame", function(data) {
         let blueCount = 0;
         let redCount = 0;
@@ -170,6 +178,7 @@ function pageInit() {
         playAgain.style.display = "block";
     });
 
+    // Displays the results in the form of percentage bars
     function displayResults(results, resultBars) {
         let delay = 100;
         let maxPercent = Math.max(results[0], results[1], results[2], results[3]);
@@ -206,6 +215,7 @@ function pageInit() {
         }
     }
 
+    // Event Listener to move the player
     function moveListener(e) {
         e.preventDefault();
         let validKey = false;
@@ -281,6 +291,7 @@ function pageInit() {
         }
     }
 
+    // Event Listener for the Play Again button
     playAgain.addEventListener("mouseup", () => {
         window.location = "";
     });
